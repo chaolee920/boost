@@ -15,5 +15,6 @@ module.exports = function(app) {
 	});
 
 	app.use('/api/users', require('./api/users'));
+	app.use('/api/promos', require('./api/promos'));
 
 };
