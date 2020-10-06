@@ -116,6 +116,13 @@ exports.login = function(req, res) {
     });
 }
 
+exports.getMe = function(req, res) {
+    res.json({
+        code: 200,
+        data: req.user,
+    });
+}
+
 function checkEmailDuplication(req, callback) {
     User.find({email: req.body.email}, function(err, users) {
         if (err) {

@@ -12,6 +12,8 @@ exports.checkAuthentication = function(req, res, next) {
                     message: config.AUTHENTICATION_FAILED,
                 });
 			} else {
+				delete decoded.iat;
+				delete decoded.exp;
 				req.user = decoded;
 				next();
 			}
