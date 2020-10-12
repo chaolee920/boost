@@ -1,29 +1,21 @@
 const async = require('async');
-const Promo = require('./promo.model.js');
+const Restaurant = require('./restaurant.model.js');
 const config = require('../../config');
 
 exports.create = function(req, res) {
 
-    if (!req.body.name ||
-        !req.body.type ||
-        !req.body.startDate ||
-        !req.body.endDate
-    ) {
+    if (!req.body.name) {
         return res.json({
             code: 400,
             message: config.MISSING_PARAMETER,
         });
     }
 
-    const newPromo = new Promo({
+    const newRestaurant = new Restaurant({
         name: req.body.name,
-        type: req.body.type,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        creator: req.user._id,
     });
     
-    newPromo.save(function(err, data) {
+    newRestaurant.save(function(err, data) {
         if (err) {
             res.json({
                 code: 402,
@@ -38,9 +30,9 @@ exports.create = function(req, res) {
     });
 }
 
-exports.getPromos = function(req, res) {
+exports.getRestaurants = function(req, res) {
 
-    Promo.find({}).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+    Restaurant.find({}).populate('creator', 'email firstName lastName roles').exec(function(err, restaurants) {
         if (err) {
             res.json({
                 code: 402,
@@ -49,21 +41,21 @@ exports.getPromos = function(req, res) {
         } else {
             res.json({
                 code: 200,
-                data: promos,
+                data: restaurants,
             });
         }
     });
 }
 
-exports.getPromo = function(req, res) {
+exports.getRestaurant = function(req, res) {
 
-    Promo.find({ _id: req.params.id }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+    Restaurant.find({ _id: req.params.id }).populate('event').exec(function(err, restaurants) {
         if (err) {
             res.json({
                 code: 402,
                 message: config.DB_ERROR,
             });
-        } else if (promos.length === 0) {
+        } else if (restaurants.length === 0) {
             res.json({
                 code: 404,
                 message: config.NOT_FOUND,
@@ -71,7 +63,7 @@ exports.getPromo = function(req, res) {
         } else {
             res.json({
                 code: 200,
-                data: promos[0],
+                data: restaurants[0],
             });
         }
     });
@@ -79,21 +71,21 @@ exports.getPromo = function(req, res) {
 
 exports.update = function(req, res) {
 
-    Promo.find({ _id: req.params.id }, function(err, promos) {
+    Restaurant.find({ _id: req.params.id }, function(err, restaurants) {
         if (err) {
             res.json({
                 code: 402,
                 message: config.DB_ERROR,
             });
-        } else if (promos.length === 0) {
+        } else if (restaurants.length === 0) {
             res.json({
                 code: 404,
                 message: config.NOT_FOUND,
             });
         } else {
-            promos[0] = Object.assign(promos[0], req.body);
+            restaurants[0] = Object.assign(restaurants[0], req.body);
 
-            promos[0].save(function (err, result) {
+            restaurants[0].save(function (err, result) {
                 if (err) {
                     return res.json({
                         code: 402,
@@ -111,19 +103,19 @@ exports.update = function(req, res) {
 
 exports.delete = function(req, res) {
 
-    Promo.find({ _id: req.params.id }, function(err, promos) {
+    Restaurant.find({ _id: req.params.id }, function(err, restaurants) {
         if (err) {
             res.json({
                 code: 402,
                 message: config.DB_ERROR,
             });
-        } else if (promos.length === 0) {
+        } else if (restaurants.length === 0) {
             res.json({
                 code: 404,
                 message: config.NOT_FOUND,
             });
         } else {
-            promos[0].remove(function (err, result) {
+            restaurants[0].remove(function (err, result) {
                 if (err) {
                     return res.json({
                         code: 402,

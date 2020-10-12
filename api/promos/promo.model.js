@@ -18,6 +18,10 @@ const promoSchema = new Schema({
 		type: Date,
 		required: true
 	},
+	restaurant: {
+		type: Schema.Types.ObjectId,
+		ref: 'Restaurants'
+	},
 	creator: {
 		type: Schema.Types.ObjectId,
 		ref: 'Users'
