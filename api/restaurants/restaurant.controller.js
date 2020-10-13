@@ -1,5 +1,6 @@
 const async = require('async');
 const Restaurant = require('./restaurant.model.js');
+const Promo = require('../promos/promo.model.js');
 const config = require('../../config');
 
 exports.create = function(req, res) {
@@ -126,6 +127,25 @@ exports.delete = function(req, res) {
                     code: 200,
                     data: config.REMOVED,
                 });
+            });
+        }
+    });
+}
+
+exports.getPromosByRestaurant = function(req, res) {
+
+    Promo.find({
+        restaurant: req.params.id,
+    }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+        if (err) {
+            res.json({
+                code: 402,
+                message: config.DB_ERROR,
+            });
+        } else {
+            res.json({
+                code: 200,
+                data: promos,
             });
         }
     });
