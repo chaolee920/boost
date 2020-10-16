@@ -21,7 +21,7 @@ exports.create = function(req, res) {
     newSubscribe.save(function(err, data) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -38,7 +38,7 @@ exports.getSubscribes = function(req, res) {
     Subscribe.find({}).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -55,7 +55,7 @@ exports.delete = function(req, res) {
     Subscribe.find({ _id: req.params.id }, function(err, subscribes) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (subscribes.length === 0) {
@@ -69,7 +69,7 @@ exports.delete = function(req, res) {
             subscribes[0].save(function (err, result) {
                 if (err) {
                     return res.json({
-                        code: 402,
+                        code: 500,
                         message: config.DB_ERROR,
                     });
                 }
