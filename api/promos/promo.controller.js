@@ -26,7 +26,7 @@ exports.create = function(req, res) {
     newPromo.save(function(err, data) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -43,7 +43,7 @@ exports.getPromos = function(req, res) {
     Promo.find({}).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -60,7 +60,7 @@ exports.getPromo = function(req, res) {
     Promo.find({ _id: req.params.id }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (promos.length === 0) {
@@ -82,7 +82,7 @@ exports.update = function(req, res) {
     Promo.find({ _id: req.params.id }, function(err, promos) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (promos.length === 0) {
@@ -96,7 +96,7 @@ exports.update = function(req, res) {
             promos[0].save(function (err, result) {
                 if (err) {
                     return res.json({
-                        code: 402,
+                        code: 500,
                         message: config.DB_ERROR,
                     });
                 }
@@ -114,7 +114,7 @@ exports.delete = function(req, res) {
     Promo.find({ _id: req.params.id }, function(err, promos) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (promos.length === 0) {
@@ -126,7 +126,7 @@ exports.delete = function(req, res) {
             promos[0].remove(function (err, result) {
                 if (err) {
                     return res.json({
-                        code: 402,
+                        code: 500,
                         message: config.DB_ERROR,
                     });
                 }

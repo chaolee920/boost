@@ -1,5 +1,6 @@
 const async = require('async');
 const Restaurant = require('./restaurant.model.js');
+const Promo = require('../promos/promo.model.js');
 const config = require('../../config');
 
 exports.create = function(req, res) {
@@ -18,7 +19,7 @@ exports.create = function(req, res) {
     newRestaurant.save(function(err, data) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -35,7 +36,7 @@ exports.getRestaurants = function(req, res) {
     Restaurant.find({}).populate('creator', 'email firstName lastName roles').exec(function(err, restaurants) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else {
@@ -52,7 +53,7 @@ exports.getRestaurant = function(req, res) {
     Restaurant.find({ _id: req.params.id }).populate('event').exec(function(err, restaurants) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (restaurants.length === 0) {
@@ -74,7 +75,7 @@ exports.update = function(req, res) {
     Restaurant.find({ _id: req.params.id }, function(err, restaurants) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (restaurants.length === 0) {
@@ -88,7 +89,7 @@ exports.update = function(req, res) {
             restaurants[0].save(function (err, result) {
                 if (err) {
                     return res.json({
-                        code: 402,
+                        code: 500,
                         message: config.DB_ERROR,
                     });
                 }
@@ -106,7 +107,7 @@ exports.delete = function(req, res) {
     Restaurant.find({ _id: req.params.id }, function(err, restaurants) {
         if (err) {
             res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if (restaurants.length === 0) {
@@ -118,7 +119,7 @@ exports.delete = function(req, res) {
             restaurants[0].remove(function (err, result) {
                 if (err) {
                     return res.json({
-                        code: 402,
+                        code: 500,
                         message: config.DB_ERROR,
                     });
                 }
@@ -126,6 +127,25 @@ exports.delete = function(req, res) {
                     code: 200,
                     data: config.REMOVED,
                 });
+            });
+        }
+    });
+}
+
+exports.getPromosByRestaurant = function(req, res) {
+
+    Promo.find({
+        restaurant: req.params.id,
+    }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+        if (err) {
+            res.json({
+                code: 500,
+                message: config.DB_ERROR,
+            });
+        } else {
+            res.json({
+                code: 200,
+                data: promos,
             });
         }
     });
