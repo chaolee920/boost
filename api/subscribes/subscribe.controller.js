@@ -35,7 +35,30 @@ exports.create = function(req, res) {
 
 exports.getSubscribes = function(req, res) {
 
-    Subscribe.find({}).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
+    Subscribe.find({
+        user: req.user._id,
+        status: 0,
+    }).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
+        if (err) {
+            res.json({
+                code: 500,
+                message: config.DB_ERROR,
+            });
+        } else {
+            res.json({
+                code: 200,
+                data: subscribes,
+            });
+        }
+    });
+}
+
+exports.getUserSubscribesByPromo = function(req, res) {
+
+    Subscribe.find({
+        promo: req.params.id,
+        status: 0,
+    }).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
         if (err) {
             res.json({
                 code: 500,
