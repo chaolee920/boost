@@ -15,7 +15,7 @@ exports.signup = function(req, res) {
     checkEmailDuplication(req, function(result) {
         if (result.status === 'error') {
             return res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         } else if(result.status === 'duplicated'){
@@ -37,7 +37,7 @@ exports.signup = function(req, res) {
                 newUser.save(function(err, data) {
                     if (err) {
                         res.json({
-                            code: 402,
+                            code: 500,
                             message: config.DB_ERROR,
                         });
                     } else {
@@ -76,7 +76,7 @@ exports.login = function(req, res) {
     User.find({email: req.body.email}, function(err, users) {
         if (err){
             return res.json({
-                code: 402,
+                code: 500,
                 message: config.DB_ERROR,
             });
         }
