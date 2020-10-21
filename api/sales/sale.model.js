@@ -1,18 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const subscribeSchema = new Schema({
-	promo: {
+const saleSchema = new Schema({
+	subscription: {
 		type: Schema.Types.ObjectId,
-		ref: 'Promos'
-	},
-	user: {
-		type: Schema.Types.ObjectId,
-		ref: 'Users'
+		ref: 'Subscribes'
 	},
 	status: {
 		type: Number,
 		required: true
+	},
+	date: {
+		type: Date,
 	},
 }, {
 	timestamps: {
@@ -20,7 +19,7 @@ const subscribeSchema = new Schema({
 		updatedAt: 'updated'
 	}
 }, {
-	collection: 'subscribes'
+	collection: 'sales'
 });
 
-module.exports = mongoose.model('Subscribes', subscribeSchema);
+module.exports = mongoose.model('Sales', saleSchema);

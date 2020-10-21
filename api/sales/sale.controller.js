@@ -1,23 +1,23 @@
 const async = require('async');
-const Subscribe = require('./subscribe.model.js');
+const Sale = require('./sale.model.js');
 const config = require('../../config');
 
 exports.create = function(req, res) {
 
-    if (!req.body.promo) {
+    if (!req.body.subscription || !req.body.date) {
         return res.json({
             code: 400,
             message: config.MISSING_PARAMETER,
         });
     }
 
-    const newSubscribe = new Subscribe({
-        promo: req.body.promo,
-        user: req.user._id,
+    const newSale = new Sale({
+        subscription: req.body.subscription,
+        date: req.body.date,
         status: 0,
     });
     
-    newSubscribe.save(function(err, data) {
+    newSale.save(function(err, data) {
         if (err) {
             res.json({
                 code: 500,
@@ -32,12 +32,11 @@ exports.create = function(req, res) {
     });
 }
 
-exports.getSubscribes = function(req, res) {
+exports.getSales = function(req, res) {
 
-    Subscribe.find({
-        user: req.user._id,
+    Sale.find({
         status: 0,
-    }).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
+    }).populate('subscription').exec(function(err, sales) {
         if (err) {
             res.json({
                 code: 500,
@@ -46,27 +45,7 @@ exports.getSubscribes = function(req, res) {
         } else {
             res.json({
                 code: 200,
-                data: subscribes,
-            });
-        }
-    });
-}
-
-exports.getUserSubscribesByPromo = function(req, res) {
-
-    Subscribe.find({
-        promo: req.params.id,
-        status: 0,
-    }).populate('promo').populate('user', 'email firstName lastName roles').exec(function(err, subscribes) {
-        if (err) {
-            res.json({
-                code: 500,
-                message: config.DB_ERROR,
-            });
-        } else {
-            res.json({
-                code: 200,
-                data: subscribes,
+                data: sales,
             });
         }
     });
@@ -74,21 +53,21 @@ exports.getUserSubscribesByPromo = function(req, res) {
 
 exports.delete = function(req, res) {
 
-    Subscribe.find({ _id: req.params.id }, function(err, subscribes) {
+    Sale.find({ _id: req.params.id }, function(err, sales) {
         if (err) {
             res.json({
                 code: 500,
                 message: config.DB_ERROR,
             });
-        } else if (subscribes.length === 0) {
+        } else if (sales.length === 0) {
             res.json({
                 code: 404,
                 message: config.NOT_FOUND,
             });
         } else {
-            subscribes[0].status = -1;
+            sales[0].status = -1;
 
-            subscribes[0].save(function (err, result) {
+            sales[0].save(function (err, result) {
                 if (err) {
                     return res.json({
                         code: 500,

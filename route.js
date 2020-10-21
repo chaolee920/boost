@@ -18,4 +18,5 @@ module.exports = function(app) {
 	app.use('/api/promos', require('./api/promos'));
 	app.use('/api/restaurants', require('./api/restaurants'));
 	app.use('/api/subscribes', require('./api/subscribes'));
+	app.use('/api/sales', require('./api/sales'));
 };
