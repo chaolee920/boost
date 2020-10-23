@@ -1,4 +1,3 @@
-const async = require('async');
 const Subscribe = require('./subscribe.model.js');
 const config = require('../../config');
 

@@ -1,5 +1,6 @@
 const async = require('async');
 const Sale = require('./sale.model.js');
+const Subscribe = require('../subscribes/subscribe.model.js');
 const config = require('../../config');
 
 exports.create = function(req, res) {
@@ -32,20 +33,67 @@ exports.create = function(req, res) {
     });
 }
 
-exports.getSales = function(req, res) {
-
-    Sale.find({
-        status: 0,
-    }).populate('subscription').exec(function(err, sales) {
-        if (err) {
-            res.json({
-                code: 500,
-                message: config.DB_ERROR,
+exports.getSalesByUser = function(req, res) {
+    async.waterfall([
+        function(cb) {
+            Subscribe.find({
+                status: 0,
+                user: req.params.id,
+            }).populate('promo').exec(function(err, subscribes) {
+                if (err) {
+                    cb({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                } else {
+                    cb(null, subscribes);
+                }
             });
+        },
+        function (subscribes, cb) {
+            Sale.find({
+                subscription: subscribes.map(function (s) {
+                    return s._id;
+                }),
+                status: 0,
+            }).populate('subscription').exec(function(err, sales) {
+                if (err) {
+                    cb({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                } else {
+                    cb(null, sales, subscribes);
+                }
+            });
+        }
+    ], function(err, sales, subscribes) {
+        if (err) {
+            res.json(err);
         } else {
+            const result = subscribes.map(function (s) {
+                return {
+                    promo: s.promo,
+                    sales: [],
+                }
+            });
+            sales.forEach(function (sale) {
+                const resultSale = result.find(function(r) {
+                    return r.promo._id.toString() === sale.subscription.promo.toString();
+                });
+                if (resultSale) {
+                    resultSale.sales.push({
+                        _id: sale._id,
+                        date: sale.date,
+                        status: sale.status,
+                        created: sale.created,
+                        updated: sale.updated,
+                    });
+                }
+            });
             res.json({
                 code: 200,
-                data: sales,
+                data: result,
             });
         }
     });
