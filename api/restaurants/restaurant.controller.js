@@ -1,4 +1,3 @@
-const async = require('async');
 const Restaurant = require('./restaurant.model.js');
 const Promo = require('../promos/promo.model.js');
 const config = require('../../config');

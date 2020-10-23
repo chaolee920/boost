@@ -1,4 +1,3 @@
-const async = require('async');
 const Promo = require('./promo.model.js');
 const config = require('../../config');
 
