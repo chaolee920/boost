@@ -99,6 +99,78 @@ exports.getSalesByUser = function(req, res) {
     });
 }
 
+exports.getSalesByPromo = function(req, res) {
+    async.waterfall([
+        function(cb) {
+            Subscribe.find({
+                status: 0,
+                promo: req.params.id,
+            }).populate('user').exec(function(err, subscribes) {
+                if (err) {
+                    cb({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                } else {
+                    cb(null, subscribes);
+                }
+            });
+        },
+        function (subscribes, cb) {
+            Sale.find({
+                subscription: subscribes.map(function (s) {
+                    return s._id;
+                }),
+                status: 0,
+            }).populate('subscription').exec(function(err, sales) {
+                if (err) {
+                    cb({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                } else {
+                    cb(null, sales, subscribes);
+                }
+            });
+        }
+    ], function(err, sales, subscribes) {
+        if (err) {
+            res.json(err);
+        } else {
+            const result = subscribes.map(function (s) {
+                return {
+                    user: {
+                        _id: s.user._id,
+                        firstName: s.user.firstName,
+                        lastName: s.user.lastName,
+                        email: s.user.email,
+                        roles: s.user.roles,
+                    },
+                    sales: [],
+                }
+            });
+            sales.forEach(function (sale) {
+                const resultSale = result.find(function(r) {
+                    return r.user._id.toString() === sale.subscription.user.toString();
+                });
+                if (resultSale) {
+                    resultSale.sales.push({
+                        _id: sale._id,
+                        date: sale.date,
+                        status: sale.status,
+                        created: sale.created,
+                        updated: sale.updated,
+                    });
+                }
+            });
+            res.json({
+                code: 200,
+                data: result,
+            });
+        }
+    });
+}
+
 exports.delete = function(req, res) {
 
     Sale.find({ _id: req.params.id }, function(err, sales) {
