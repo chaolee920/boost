@@ -1,5 +1,5 @@
-const Restaurant = require('./restaurant.model.js');
-const Promo = require('../promos/promo.model.js');
+const Restaurant = require('./restaurant.model');
+const Promo = require('../promos/promo.model');
 const config = require('../../config');
 
 exports.create = function(req, res) {

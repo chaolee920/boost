@@ -1,4 +1,4 @@
-const Subscribe = require('./subscribe.model.js');
+const Subscribe = require('./subscribe.model');
 const config = require('../../config');
 
 exports.create = function(req, res) {

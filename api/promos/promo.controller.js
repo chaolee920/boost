@@ -1,4 +1,4 @@
-const Promo = require('./promo.model.js');
+const Promo = require('./promo.model');
 const config = require('../../config');
 
 exports.create = function(req, res) {

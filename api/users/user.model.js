@@ -18,7 +18,11 @@ const userSchema = new Schema({
 	passwordHash: {
 		type: String,
 		required: true
-	}
+	},
+	image: {
+		type: String,
+		required: false
+	},
 }, {
 	timestamps: {
 		createdAt: 'created',
