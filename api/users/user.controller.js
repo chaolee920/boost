@@ -122,6 +122,37 @@ exports.getMe = function(req, res) {
     });
 }
 
+exports.update = function(req, res) {
+    User.find({ _id: req.user._id }, function(err, users) {
+        if (err) {
+            res.json({
+                code: 500,
+                message: config.DB_ERROR,
+            });
+        } else if (users.length === 0) {
+            res.json({
+                code: 404,
+                message: config.NOT_FOUND,
+            });
+        } else {
+            users[0] = Object.assign(users[0], req.body);
+
+            users[0].save(function (err, result) {
+                if (err) {
+                    return res.json({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                }
+                res.json({
+                    code: 200,
+                    data: config.UPDATED,
+                });
+            });
+        }
+    });
+}
+
 function checkEmailDuplication(req, callback) {
     User.find({email: req.body.email}, function(err, users) {
         if (err) {

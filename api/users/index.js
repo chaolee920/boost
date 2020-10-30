@@ -6,5 +6,6 @@ const authService = require('../auth.service');
 router.post('/', controller.signup);
 router.post('/login', controller.login);
 router.get('/me', authService.checkAuthentication, controller.getMe);
+router.put('/', authService.checkAuthentication, controller.update);
 
 module.exports = router;
