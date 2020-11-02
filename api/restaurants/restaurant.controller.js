@@ -4,7 +4,7 @@ const config = require('../../config');
 
 exports.create = function(req, res) {
 
-    if (!req.body.name) {
+    if (!req.body.name || !req.body.goal) {
         return res.json({
             code: 400,
             message: config.MISSING_PARAMETER,
@@ -13,6 +13,7 @@ exports.create = function(req, res) {
 
     const newRestaurant = new Restaurant({
         name: req.body.name,
+        goal: req.body.goal,
     });
     
     newRestaurant.save(function(err, data) {

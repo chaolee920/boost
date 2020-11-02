@@ -22,6 +22,14 @@ const promoSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Restaurants'
 	},
+	image: {
+		type: String,
+		required: false,
+	},
+	description: {
+		type: String,
+		required: false,
+	},
 	creator: {
 		type: Schema.Types.ObjectId,
 		ref: 'Users'
