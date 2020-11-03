@@ -1,4 +1,4 @@
-const Promo = require('./promo.model.js');
+const Promo = require('./promo.model');
 const config = require('../../config');
 
 exports.create = function(req, res) {
@@ -19,6 +19,8 @@ exports.create = function(req, res) {
         type: req.body.type,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
+        image: req.body.image || '',
+        description: req.body.description || '',
         creator: req.user._id,
     });
     

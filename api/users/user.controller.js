@@ -3,6 +3,21 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 
+function getFilteredUser(user) {
+    return {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+        email: user.email,
+        roles: user.roles,
+        image: user.image || '',
+        created: user.created,
+        updated: user.updated,
+    };
+}
+
+exports.getFilteredUser = getFilteredUser;
+
 exports.signup = function(req, res) {
 
     if (!req.body.email || !req.body.password || !req.body.firstName || !req.body.lastName) {
@@ -41,15 +56,7 @@ exports.signup = function(req, res) {
                             message: config.DB_ERROR,
                         });
                     } else {
-                        const userObj = {
-                            firstName: data.firstName,
-                            lastName: data.lastName,
-                            _id: data._id,
-                            email: data.email,
-                            roles: data.roles,
-                            created: data.created,
-                            updated: data.updated
-                        };
+                        const userObj = getFilteredUser(data);
                         const token = jwt.sign(userObj, config.JWT_SECRET, { 'expiresIn': '5h' });
 
                         res.json({
@@ -95,15 +102,7 @@ exports.login = function(req, res) {
                 });
             }
             
-            const userObj = {
-                firstName: users[0].firstName,
-                lastName: users[0].lastName,
-                _id: users[0]._id,
-                email: users[0].email,
-                roles: users[0].roles,
-                created: users[0].created,
-                updated: users[0].updated
-            };
+            const userObj = getFilteredUser(users[0]);
             const token = jwt.sign(userObj, config.JWT_SECRET, { 'expiresIn': '5h' });
             res.json({
                 code: 200,
@@ -120,6 +119,37 @@ exports.getMe = function(req, res) {
     res.json({
         code: 200,
         data: req.user,
+    });
+}
+
+exports.update = function(req, res) {
+    User.find({ _id: req.user._id }, function(err, users) {
+        if (err) {
+            res.json({
+                code: 500,
+                message: config.DB_ERROR,
+            });
+        } else if (users.length === 0) {
+            res.json({
+                code: 404,
+                message: config.NOT_FOUND,
+            });
+        } else {
+            users[0] = Object.assign(users[0], req.body);
+
+            users[0].save(function (err, result) {
+                if (err) {
+                    return res.json({
+                        code: 500,
+                        message: config.DB_ERROR,
+                    });
+                }
+                res.json({
+                    code: 200,
+                    data: config.UPDATED,
+                });
+            });
+        }
     });
 }
 

@@ -1,6 +1,7 @@
 const async = require('async');
-const Sale = require('./sale.model.js');
-const Subscribe = require('../subscribes/subscribe.model.js');
+const Sale = require('./sale.model');
+const Subscribe = require('../subscribes/subscribe.model');
+const userController = require('../users/user.controller');
 const config = require('../../config');
 
 exports.create = function(req, res) {
@@ -139,13 +140,7 @@ exports.getSalesByPromo = function(req, res) {
         } else {
             const result = subscribes.map(function (s) {
                 return {
-                    user: {
-                        _id: s.user._id,
-                        firstName: s.user.firstName,
-                        lastName: s.user.lastName,
-                        email: s.user.email,
-                        roles: s.user.roles,
-                    },
+                    user: userController.getFilteredUser(s.user),
                     sales: [],
                 }
             });
