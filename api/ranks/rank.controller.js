@@ -35,10 +35,33 @@ exports.create = function(req, res) {
 
 exports.getRankByDay = function(req, res) {
     const date = req.query.date ? new Date(req.query.date) : new Date();
-    const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000 - 1);
     
     Rank.find({
         date: { "$gte": date, "$lt": nextDate }
+    }).sort('rank').populate('user', 'email firstName lastName roles, image').exec(function(err, ranks) {
+        if (err) {
+            res.json({
+                code: 500,
+                message: config.DB_ERROR,
+            });
+        } else {
+            res.json({
+                code: 200,
+                data: ranks,
+            });
+        }
+    });
+}
+
+exports.getRanksByUserByMonth = function(req, res) {
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endDate = new Date((new Date(today.getFullYear(), today.getMonth() + 1, 1)).getTime() - 1);
+    
+    Rank.find({
+        date: { "$gte": startDate, "$lt": endDate },
+        user: req.params.id || req.user._id,
     }).sort('rank').populate('user', 'email firstName lastName roles, image').exec(function(err, ranks) {
         if (err) {
             res.json({
