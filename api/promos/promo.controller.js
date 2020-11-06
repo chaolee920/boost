@@ -41,7 +41,7 @@ exports.create = function(req, res) {
 
 exports.getPromos = function(req, res) {
 
-    Promo.find({}).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+    Promo.find({}).populate('restaurant').populate('creator', 'email firstName lastName roles, image').exec(function(err, promos) {
         if (err) {
             res.json({
                 code: 500,
@@ -58,7 +58,7 @@ exports.getPromos = function(req, res) {
 
 exports.getPromo = function(req, res) {
 
-    Promo.find({ _id: req.params.id }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+    Promo.find({ _id: req.params.id }).populate('restaurant').populate('creator', 'email firstName lastName roles, image').exec(function(err, promos) {
         if (err) {
             res.json({
                 code: 500,

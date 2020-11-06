@@ -33,7 +33,7 @@ exports.create = function(req, res) {
 
 exports.getRestaurants = function(req, res) {
 
-    Restaurant.find({}).populate('creator', 'email firstName lastName roles').exec(function(err, restaurants) {
+    Restaurant.find({}).populate('creator', 'email firstName lastName roles, image').exec(function(err, restaurants) {
         if (err) {
             res.json({
                 code: 500,
@@ -136,7 +136,7 @@ exports.getPromosByRestaurant = function(req, res) {
 
     Promo.find({
         restaurant: req.params.id,
-    }).populate('restaurant').populate('creator', 'email firstName lastName roles').exec(function(err, promos) {
+    }).populate('restaurant').populate('creator', 'email firstName lastName roles, image').exec(function(err, promos) {
         if (err) {
             res.json({
                 code: 500,

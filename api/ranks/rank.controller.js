@@ -1,22 +1,24 @@
-const Subscribe = require('./subscribe.model');
+const async = require('async');
+const Rank = require('./rank.model');
 const config = require('../../config');
 
 exports.create = function(req, res) {
 
-    if (!req.body.promo) {
+    if (!req.body.user || !req.body.rank || !req.body.date || !(req.body.sold >= 0)) {
         return res.json({
             code: 400,
             message: config.MISSING_PARAMETER,
         });
     }
 
-    const newSubscribe = new Subscribe({
-        promo: req.body.promo,
-        user: req.user._id,
-        status: 0,
+    const newRank = new Rank({
+        user: req.body.user,
+        rank: req.body.rank,
+        date: req.body.date,
+        sold: req.body.sold,
     });
     
-    newSubscribe.save(function(err, data) {
+    newRank.save(function(err, data) {
         if (err) {
             res.json({
                 code: 500,
@@ -31,12 +33,13 @@ exports.create = function(req, res) {
     });
 }
 
-exports.getSubscribes = function(req, res) {
-
-    Subscribe.find({
-        user: req.user._id,
-        status: 0,
-    }).populate('promo').populate('user', 'email firstName lastName roles, image').exec(function(err, subscribes) {
+exports.getRankByDay = function(req, res) {
+    const date = req.query.date ? new Date(req.query.date) : new Date();
+    const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000 - 1);
+    
+    Rank.find({
+        date: { "$gte": date, "$lt": nextDate }
+    }).sort('rank').populate('user', 'email firstName lastName roles, image').exec(function(err, ranks) {
         if (err) {
             res.json({
                 code: 500,
@@ -45,18 +48,21 @@ exports.getSubscribes = function(req, res) {
         } else {
             res.json({
                 code: 200,
-                data: subscribes,
+                data: ranks,
             });
         }
     });
 }
 
-exports.getUserSubscribesByPromo = function(req, res) {
-
-    Subscribe.find({
-        promo: req.params.id,
-        status: 0,
-    }).populate('promo').populate('user', 'email firstName lastName roles, image').exec(function(err, subscribes) {
+exports.getRanksByUserByMonth = function(req, res) {
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endDate = new Date((new Date(today.getFullYear(), today.getMonth() + 1, 1)).getTime() - 1);
+    
+    Rank.find({
+        date: { "$gte": startDate, "$lt": endDate },
+        user: req.params.id || req.user._id,
+    }).sort('rank').populate('user', 'email firstName lastName roles, image').exec(function(err, ranks) {
         if (err) {
             res.json({
                 code: 500,
@@ -65,7 +71,7 @@ exports.getUserSubscribesByPromo = function(req, res) {
         } else {
             res.json({
                 code: 200,
-                data: subscribes,
+                data: ranks,
             });
         }
     });
@@ -73,21 +79,19 @@ exports.getUserSubscribesByPromo = function(req, res) {
 
 exports.delete = function(req, res) {
 
-    Subscribe.find({ _id: req.params.id }, function(err, subscribes) {
+    Rank.find({ _id: req.params.id }, function(err, ranks) {
         if (err) {
             res.json({
                 code: 500,
                 message: config.DB_ERROR,
             });
-        } else if (subscribes.length === 0) {
+        } else if (ranks.length === 0) {
             res.json({
                 code: 404,
                 message: config.NOT_FOUND,
             });
         } else {
-            subscribes[0].status = -1;
-
-            subscribes[0].save(function (err, result) {
+            ranks[0].remove(function (err, result) {
                 if (err) {
                     return res.json({
                         code: 500,
@@ -96,7 +100,7 @@ exports.delete = function(req, res) {
                 }
                 res.json({
                     code: 200,
-                    data: config.UPDATED,
+                    data: config.REMOVED,
                 });
             });
         }
