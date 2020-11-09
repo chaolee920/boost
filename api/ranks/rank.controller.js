@@ -36,7 +36,7 @@ exports.create = function(req, res) {
 exports.getRankByDay = function(req, res) {
     const date = req.query.date ? new Date(req.query.date) : new Date();
     const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000 - 1);
-    
+
     Rank.find({
         date: { "$gte": date, "$lt": nextDate }
     }).sort('rank').populate('user', 'email firstName lastName roles, image').exec(function(err, ranks) {
