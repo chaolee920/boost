@@ -20,4 +20,5 @@ module.exports = function(app) {
 	app.use('/api/subscribes', require('./api/subscribes'));
 	app.use('/api/sales', require('./api/sales'));
 	app.use('/api/ranks', require('./api/ranks'));
+	app.use('/api/surveys', require('./api/surveys'));
 };
