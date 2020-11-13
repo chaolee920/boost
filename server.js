@@ -6,6 +6,7 @@ const app = express();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const config = require('./config');
+const rank = require('./api/ranks/cron');
 
 mongoose.connect(config.DB_URI);
 
@@ -35,5 +36,7 @@ require('./route')(app);
 app.listen(port);
 
 console.log('Requests on port:' + port);
+
+rank.start();
 
 exports = module.exports = app;
